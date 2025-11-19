@@ -24,6 +24,7 @@ import kotlin.collections.get
 import androidx.compose.material3.Text
 import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,20 +40,25 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun IU(miViewModel: MyViewModel) {
+
+    // el la diferencia de = y by es que by me recoje el valor directamente de la variable de adentro (del MutableStateFlow)
+    val descarga by Datos.descarga.collectAsState()
+    val estadoActual by miViewModel.estadoLiveData.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Text(
-            text = "ESTADO: ${miViewModel.estadoLiveData.value}",
+            text = "ESTADO: ${estadoActual}",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Text(
-            text = "CARGANDO...",
+            text = descarga,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 24.dp)
@@ -71,9 +77,6 @@ fun Boton(miViewModel: MyViewModel) {
     //Esta variable rastrea el estado del boton
     var _activo by remember { mutableStateOf(miViewModel.estadoLiveData.value!!.boton_activo) }
 
-    miViewModel.estadoLiveData.observe(LocalLifecycleOwner.current) {
-        _activo = miViewModel.estadoLiveData.value!!.boton_activo
-    }
 
     Button(
         enabled = _activo,

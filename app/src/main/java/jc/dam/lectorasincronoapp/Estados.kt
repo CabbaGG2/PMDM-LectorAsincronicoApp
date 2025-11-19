@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object Datos {
-
     var archivo = 0
 
+    var descarga = MutableStateFlow("ESPERA POR DESCARGA...")
 }
 
 

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class MyViewModel(): ViewModel() {
@@ -16,11 +17,13 @@ class MyViewModel(): ViewModel() {
     //estados de la app
     //Livedata es para actualizar la IU
 
-    val estadoLiveData: MutableLiveData<Estados> = MutableLiveData(Estados.INICIO)
+    //el MutableStateFlow me sirve para observar la variable desde la UI
+    val estadoLiveData = MutableStateFlow(Estados.INICIO)
 
     //este va a ser nuestro archivo con peso aleatorio que se cargará
     //a distintas velocidades segun el peso del archivo.
 
+    //mutableStateOf es un observer local (por asi decirlo)
     var _pesoArchivo = mutableStateOf(0)
 
     init {
@@ -49,16 +52,19 @@ class MyViewModel(): ViewModel() {
     }
 
     fun empezarDescarga(archivo: Int) {
-        //velocidad_carga = archivo * 1000
+        val velocidad_carga = archivo * 10
 
+        Log.d(TAG_LOG,"empezamos la descarga - Estado: ${estadoLiveData.value}")
         viewModelScope.launch {
 
-
-            Log.d("corrutina", "empieza corrutina")
-            delay(3000)
-            Log.d("corrutina", ".... 3 sg")
-            delay(1000)
+            for (i in 0..100 step 10) {
+                Datos.descarga.value = "$i %"
+                delay(velocidad_carga.toLong())
+            }
+            estadoLiveData.value = Estados.FINALIZADO
+            Log.d(TAG_LOG,"Terminamos la descarga - Estado: ${estadoLiveData.value}")
         }
+
         Log.d("corrutina", "Hilo principal")
 
     }
